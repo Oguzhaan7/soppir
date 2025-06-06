@@ -47,6 +47,42 @@ export const useAuth = () => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    setAuthLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error as AuthError };
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const signInWithGithub = async () => {
+    setAuthLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "github",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error as AuthError };
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   const signOut = async () => {
     setAuthLoading(true);
 
@@ -61,13 +97,12 @@ export const useAuth = () => {
     }
   };
 
-  const resetPassword = async (email: string) => {
+  const forgotPassword = async (email: string) => {
     setAuthLoading(true);
     try {
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
       });
-
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -77,13 +112,31 @@ export const useAuth = () => {
     }
   };
 
+  const updatePassword = async (newPassword: string) => {
+    setAuthLoading(true);
+    try {
+      const { data, error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error as AuthError };
+    } finally {
+      setAuthLoading(false);
+    }
+  };
   return {
     user,
     loading: loading || authLoading,
     signUp,
     signIn,
+    signInWithGoogle,
+    signInWithGithub,
     signOut,
-    resetPassword,
+    forgotPassword,
+    updatePassword,
     isAuthenticated: !!user,
+    supabase,
   };
 };
