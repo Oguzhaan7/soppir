@@ -48,10 +48,7 @@ export const cartApi = {
       .eq("cart_id", cartId)
       .order("added_at", { ascending: false });
 
-    if (error) {
-      console.error("Cart items fetch error:", error);
-      throw error;
-    }
+    if (error) throw error;
 
     return ((data as RawCartItemResponse[]) || []).map(
       (item: RawCartItemResponse) => ({
@@ -93,6 +90,21 @@ export const cartApi = {
     quantity: number = 1
   ): Promise<CartItem> => {
     const supabase = createClient();
+
+    const { data: existingCart } = await supabase
+      .from("cart")
+      .select("id")
+      .eq("id", cartId)
+      .single();
+
+    if (!existingCart) {
+      const { error: cartError } = await supabase.from("cart").insert({
+        id: cartId,
+        user_id: cartId,
+      });
+
+      if (cartError) throw cartError;
+    }
 
     const { data: existingItem } = await supabase
       .from("cart_items")
@@ -196,10 +208,8 @@ export const cartApi = {
     const guestItems = useCartStore.getState().getGuestItems();
     if (guestItems.length === 0) return;
 
-    const userCartId = `user_${userId}`;
-
     for (const item of guestItems) {
-      await cartApi.addItem(userCartId, item.variantId, item.quantity);
+      await cartApi.addItem(userId, item.variantId, item.quantity);
     }
 
     useCartStore.getState().clearGuestCart();

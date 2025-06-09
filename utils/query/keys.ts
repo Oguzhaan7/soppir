@@ -1,6 +1,8 @@
 import {
+  AdminOrderFilters,
   BrandFilters,
   CategoryFilters,
+  OrderFilters,
   PaginationParams,
   ProductFilters,
 } from "@/types/filter.types";
@@ -38,13 +40,11 @@ export const queryKeys = {
   },
   orders: {
     all: ["orders"] as const,
-    lists: () => [...queryKeys.orders.all, "list"] as const,
-    list: (
-      filters?: { status?: string; user_id?: string },
-      pagination?: PaginationParams
-    ) => [...queryKeys.orders.lists(), { filters, pagination }] as const,
-    details: () => [...queryKeys.orders.all, "detail"] as const,
-    detail: (id: string) => [...queryKeys.orders.details(), id] as const,
+    list: (filters?: AdminOrderFilters) =>
+      [...queryKeys.orders.all, "list", filters] as const,
+    myOrders: (userId?: string, filters?: OrderFilters) =>
+      [...queryKeys.orders.all, "my", userId, filters] as const,
+    detail: (id: string) => [...queryKeys.orders.all, "detail", id] as const,
   },
   cart: {
     all: (cartId: string | null) => ["cart", cartId] as const,

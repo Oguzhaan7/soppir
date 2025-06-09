@@ -98,7 +98,7 @@ const ResetPasswordPage = () => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event) => {
       if (event === "PASSWORD_RECOVERY") {
         setIsValidSession(true);
       } else if (event === "SIGNED_OUT") {

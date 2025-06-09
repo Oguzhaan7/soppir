@@ -13,10 +13,25 @@ export interface ProductFilters {
   search?: string;
   brand_id?: number;
   category_id?: number;
-  min_price?: number;
-  max_price?: number;
+  price_min?: number;
+  price_max?: number;
   is_featured?: boolean;
   in_stock?: boolean;
+}
+
+export interface OrderFilters {
+  status?: string;
+  user_id?: string;
+  date_from?: string;
+  date_to?: string;
+  search?: string;
+}
+
+export interface AdminOrderFilters extends OrderFilters {
+  limit?: number;
+  offset?: number;
+  sort_by?: "created_at" | "total_amount" | "status";
+  sort_order?: "asc" | "desc";
 }
 
 export interface PaginationParams {

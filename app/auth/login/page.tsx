@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { loginSchema, type LoginFormData } from "@/utils/validation/auth";
 import Link from "next/link";
 import {
   Button,
@@ -28,19 +28,6 @@ import { Icons } from "@/components/common/icons";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
-const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email address is required")
-    .email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .min(6, "Password must be at least 6 characters"),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
 const LoginPage = () => {
   const [authError, setAuthError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +36,7 @@ const LoginPage = () => {
   const { signIn, signInWithGoogle, signInWithGithub } = useAuth();
   const router = useRouter();
 
-  const form = useForm<LoginFormValues>({
+  const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -57,7 +44,7 @@ const LoginPage = () => {
     },
   });
 
-  const onSubmit = async (values: LoginFormValues) => {
+  const onSubmit = async (values: LoginFormData) => {
     setIsLoading(true);
     setAuthError("");
 

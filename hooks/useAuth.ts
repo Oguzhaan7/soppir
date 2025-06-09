@@ -3,6 +3,8 @@
 import { useSupabase } from "@/providers/supabase-provider";
 import { AuthError } from "@supabase/supabase-js";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Role } from "@/types/user.types";
 
 export const useAuth = () => {
   const { supabase, user, loading } = useSupabase();
@@ -31,7 +33,6 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     setAuthLoading(true);
-
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -126,6 +127,36 @@ export const useAuth = () => {
       setAuthLoading(false);
     }
   };
+
+  const getUserRole = async (): Promise<Role> => {
+    if (!user) return "customer";
+
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .single();
+
+    if (error || !data) return "customer";
+    return data.role as Role;
+  };
+
+  const {
+    data: userRole,
+    isLoading: roleLoading,
+    refetch: refetchRole,
+  } = useQuery({
+    queryKey: ["user-role", user?.id],
+    queryFn: getUserRole,
+    enabled: !!user && !loading,
+    staleTime: 1000 * 60 * 5,
+    retry: false,
+  });
+
+  const isAdmin = userRole === "admin";
+  const isManager = userRole === "manager";
+  const isCustomer = userRole === "customer";
+
   return {
     user,
     loading: loading || authLoading,
@@ -138,5 +169,11 @@ export const useAuth = () => {
     updatePassword,
     isAuthenticated: !!user,
     supabase,
+    userRole: userRole || "customer",
+    isAdmin,
+    isManager,
+    isCustomer,
+    roleLoading,
+    refetchRole,
   };
 };

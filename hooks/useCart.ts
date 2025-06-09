@@ -34,7 +34,7 @@ export const useCartId = () => {
     }
   }, [user]);
 
-  return user ? `user_${user.id}` : guestCartId;
+  return user ? user.id : guestCartId;
 };
 
 export const useCart = () => {
@@ -136,8 +136,6 @@ export const useAddToCart = () => {
           queryKey: queryKeys.cart.all(cartId),
         });
       }
-
-      toast.success("Product added to cart!");
     },
     onError: (error) => {
       console.error("Add to cart error:", error);
@@ -273,9 +271,8 @@ export const useTransferGuestCart = () => {
     },
     onSuccess: (transferredCount, userId) => {
       if (transferredCount > 0) {
-        const userCartId = `user_${userId}`;
         queryClient.invalidateQueries({
-          queryKey: queryKeys.cart.all(userCartId),
+          queryKey: queryKeys.cart.all(userId),
         });
 
         toast.success(`${transferredCount} items transferred to your cart!`);
