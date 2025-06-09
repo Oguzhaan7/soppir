@@ -18,13 +18,13 @@ const adminNavItems = [
     title: "Products",
     href: "/admin/products",
     icon: Icons.shoe,
-    badge: "24",
+    badge: "8",
   },
   {
     title: "Orders",
     href: "/admin/orders",
     icon: Icons.bag,
-    badge: "12",
+    badge: "4",
   },
   {
     title: "Customers",
